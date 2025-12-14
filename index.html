@@ -19,6 +19,7 @@
       :root {
         --bg: #0b0f12;
         --card: #0f1417;
+        --text: #e6eef0;
         --muted: #9aa5ad;
         --accent: #6ee7b7;
         --glass: rgba(255, 255, 255, 0.03);
@@ -29,7 +30,8 @@
       [data-theme="light"] {
         --bg: #f6f8fa;
         --card: #ffffff;
-        --muted: #556;
+        --text: #0f172a;
+        --muted: #475569;
         --accent: #0ea5a8;
         --glass: rgba(0, 0, 0, 0.03);
       }
@@ -45,8 +47,8 @@
         margin: 0;
         font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI",
           Roboto, "Helvetica Neue", Arial;
-        background: linear-gradient(180deg, var(--bg) 0%, #071218 80%);
-        color: #e6eef0;
+        background: var(--bg);
+        color: var(--text);
         -webkit-font-smoothing: antialiased;
         transition: background var(--transition), color var(--transition);
       }
@@ -69,8 +71,8 @@
         align-items: center;
       }
       .logo {
-        width: 48px;
-        height: 48px;
+        width: 49px;
+        height: 40px;
         border-radius: 10px;
         background: linear-gradient(135deg, var(--accent), #4dd0e1);
         display: flex;
@@ -252,16 +254,46 @@
         font-size: 13px;
       }
 
-      /* Responsive */
+      /* ===== RESPONSIVE FIX ===== */
+
+      /* Desktop */
+      .menu-toggle {
+        display: none;
+      }
+
+      /* Tablet & Mobile */
       @media (max-width: 920px) {
         .hero {
           grid-template-columns: 1fr;
         }
+
         .contact-grid {
           grid-template-columns: 1fr;
         }
-        .slides {
-          padding-bottom: 12px;
+      }
+
+      /* Mobile */
+      @media (max-width: 768px) {
+        nav {
+          position: fixed;
+          top: 70px;
+          right: 16px;
+          background: var(--card);
+          padding: 12px;
+          border-radius: 12px;
+          display: none;
+          flex-direction: column;
+          gap: 10px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+          z-index: 999;
+        }
+
+        nav.show {
+          display: flex;
+        }
+
+        .menu-toggle {
+          display: block;
         }
       }
     </style>
@@ -301,12 +333,13 @@
         </nav>
 
         <div class="controls">
+          <button class="btn menu-toggle" id="menuToggle">☰</button>
           <button class="btn" id="downloadCvBtn" title="Download CV">
             Download CV
           </button>
-          <button class="btn" id="themeToggle" title="Toggle theme">
+          <!--glass-2<button class="btn" id="themeToggle" title="Toggle theme">
             🌙/☀️
-          </button>
+          </button>  -->
           <button class="btn" id="musicToggle" title="Music On/Off">🔊</button>
         </div>
       </header>
@@ -642,6 +675,15 @@
       </footer>
     </div>
 
+    <script>
+      const menuToggle = document.getElementById("menuToggle");
+      const nav = document.querySelector("nav");
+
+      menuToggle.addEventListener("click", () => {
+        nav.classList.toggle("show");
+      });
+    </script>
+
     <!-- Libraries init -->
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
     <script>
@@ -651,14 +693,18 @@
       // Theme toggle
       const themeToggle = document.getElementById("themeToggle");
       const body = document.body;
-      const saved = localStorage.getItem("theme");
-      if (saved) body.setAttribute("data-theme", saved);
-      themeToggle.addEventListener("click", () => {
-        const cur = body.getAttribute("data-theme") || "dark";
-        const next = cur === "dark" ? "light" : "dark";
-        body.setAttribute("data-theme", next);
-        localStorage.setItem("theme", next);
-      });
+
+      if (themeToggle) {
+        const saved = localStorage.getItem("theme");
+        if (saved) body.setAttribute("data-theme", saved);
+
+        themeToggle.addEventListener("click", () => {
+          const cur = body.getAttribute("data-theme") || "dark";
+          const next = cur === "dark" ? "light" : "dark";
+          body.setAttribute("data-theme", next);
+          localStorage.setItem("theme", next);
+        });
+      }
 
       // Year
       document.getElementById("year").textContent = new Date().getFullYear();
@@ -752,39 +798,72 @@
           window.open(`https://wa.me/6285945052199?text=${text}`, "_blank");
         });
 
-      // Download CV using jsPDF
       const { jsPDF } = window.jspdf;
+
       function generateCvPdf() {
-        const doc = new jsPDF();
+        const doc = new jsPDF("p", "mm", "a4");
+
+        let y = 20;
+
+        // ===== HEADER =====
         doc.setFontSize(18);
-        doc.text("Dito Putra — Web Developer", 14, 20);
+        doc.text("Dito Putra — Web Developer", 14, y);
+        y += 10;
+
         doc.setFontSize(12);
-        doc.text("Email: hello@contoh.com", 14, 30);
-        doc.text("Phone: +62 812-3456-7890", 14, 36);
-        doc.text("Location: Jakarta, Indonesia", 14, 42);
-        doc.text(
-          "\nAbout:\nWeb developer berpengalaman membangun UI responsive dan maintainable code. Spesialis pada HTML, CSS, dan JavaScript.",
-          14,
-          54
-        );
-        doc.text(
-          "\nSkills:\n- HTML (95%)\n- CSS (92%)\n- JavaScript (88%)\n- Performance & Accessibility (80%)",
-          14,
-          86
-        );
-        doc.save("Zaki_CV.pdf");
+        doc.text("Email: hello@contoh.com", 14, y);
+        y += 6;
+        doc.text("Phone: +62 859-4505-2199", 14, y);
+        y += 6;
+        doc.text("Location: Jakarta, Indonesia", 14, y);
+        y += 10;
+
+        // ===== ABOUT =====
+        doc.setFontSize(14);
+        doc.text("About Me", 14, y);
+        y += 8;
+
+        doc.setFontSize(11);
+        const aboutText = `
+Saya adalah seorang Web Developer dengan fokus pada pembuatan antarmuka
+yang modern, responsif, dan mudah digunakan. Saya terbiasa menggunakan
+HTML, CSS, dan JavaScript untuk membangun website yang rapi dan terstruktur.
+  `;
+        const aboutWrapped = doc.splitTextToSize(aboutText, 180);
+        doc.text(aboutWrapped, 14, y);
+        y += aboutWrapped.length * 6;
+
+        // ===== NEW PAGE =====
+        doc.addPage();
+        y = 20;
+
+        // ===== SKILLS =====
+        doc.setFontSize(14);
+        doc.text("Skills", 14, y);
+        y += 8;
+
+        doc.setFontSize(11);
+        const skillsText = `
+- HTML (Advanced)
+- CSS (Responsive Design & Animation)
+- JavaScript (DOM & Basic Logic)
+- UI/UX Design
+- Git & Version Control
+  `;
+        const skillsWrapped = doc.splitTextToSize(skillsText, 180);
+        doc.text(skillsWrapped, 14, y);
+
+        // ===== SAVE =====
+        doc.save("Dito_Putra_CV.pdf");
       }
 
       document
         .getElementById("downloadCvBtn")
         .addEventListener("click", generateCvPdf);
+
       document
         .getElementById("downloadCvSmall")
         .addEventListener("click", generateCvPdf);
-
-      // Quick small helper to set initial sizes after fonts load
-      window.addEventListener("resize", update);
-      setTimeout(update, 300);
     </script>
     <script>
       const bgMusic = document.getElementById("bgMusic");
