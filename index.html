@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Portofolio — Web Developer (Dark Elegant)</title>
+
+    <!-- AOS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css"
+      rel="stylesheet"
+    />
+    <!-- jsPDF (for CV download) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <style>
+      :root {
+        --bg: #0b0f12;
+        --card: #0f1417;
+        --muted: #9aa5ad;
+        --accent: #6ee7b7;
+        --glass: rgba(255, 255, 255, 0.03);
+        --glass-2: rgba(255, 255, 255, 0.02);
+        --radius: 12px;
+        --transition: 300ms cubic-bezier(0.2, 0.9, 0.2, 1);
+      }
+      [data-theme="light"] {
+        --bg: #f6f8fa;
+        --card: #ffffff;
+        --muted: #556;
+        --accent: #0ea5a8;
+        --glass: rgba(0, 0, 0, 0.03);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+          Roboto, "Helvetica Neue", Arial;
+        background: linear-gradient(180deg, var(--bg) 0%, #071218 80%);
+        color: #e6eef0;
+        -webkit-font-smoothing: antialiased;
+        transition: background var(--transition), color var(--transition);
+      }
+
+      .container {
+        max-width: 1100px;
+        margin: 40px auto;
+        padding: 24px;
+      }
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .brand {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      .logo {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--accent), #4dd0e1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        color: #061014;
+      }
+      nav a {
+        color: var(--muted);
+        text-decoration: none;
+        margin: 0 10px;
+        font-weight: 600;
+      }
+      nav a:hover {
+        color: var(--accent);
+      }
+
+      .controls {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .btn {
+        color: #fff !important;
+        background: var(--glass);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        padding: 8px 12px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: transform 160ms ease, background var(--transition);
+      }
+      .btn:active {
+        transform: translateY(1px);
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: 1fr 360px;
+        gap: 28px;
+        align-items: center;
+        margin-top: 28px;
+      }
+      .card {
+        background: linear-gradient(
+          180deg,
+          var(--card),
+          rgba(255, 255, 255, 0.01)
+        );
+        padding: 22px;
+        border-radius: var(--radius);
+        box-shadow: 0 6px 20px rgba(2, 6, 8, 0.5);
+      }
+
+      .intro h1 {
+        margin: 0;
+        font-size: 28px;
+      }
+      .intro p {
+        color: var(--muted);
+        margin-top: 10px;
+        line-height: 1.6;
+      }
+
+      .profile {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        align-items: center;
+        text-align: center;
+      }
+      .avatar {
+        width: 160px;
+        height: 160px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, #122428, #11303a);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 36px;
+      }
+      .meta {
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      /* Sections */
+      section {
+        margin-top: 22px;
+      }
+      h2.section-title {
+        font-size: 18px;
+        margin: 6px 0 12px;
+      }
+
+      .skills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .skill {
+        flex: 1 1 200px;
+        background: var(--glass-2);
+        padding: 12px;
+        border-radius: 12px;
+      }
+      .skill .bar {
+        height: 10px;
+        background: rgba(255, 255, 255, 0.06);
+        border-radius: 8px;
+        margin-top: 8px;
+        overflow: hidden;
+      }
+      .skill .fill {
+        height: 100%;
+        width: 50%;
+        background: linear-gradient(90deg, var(--accent), #3ddaa7);
+      }
+
+      /* Projects slider */
+      .slider {
+        position: relative;
+        overflow: hidden;
+        border-radius: 12px;
+      }
+      .slides {
+        display: flex;
+        gap: 12px;
+        transition: transform 450ms cubic-bezier(0.2, 0.9, 0.2, 1);
+      }
+      .slide {
+        min-width: 320px;
+        flex: 0 0 320px;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.02),
+          rgba(255, 255, 255, 0.01)
+        );
+        padding: 16px;
+        border-radius: 12px;
+      }
+      .proj-img {
+        height: 140px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #091012, #12303a);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--muted);
+      }
+
+      .slider-controls {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-top: 12px;
+      }
+
+      /* Contact */
+      .contact-grid {
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: 18px;
+      }
+      form input,
+      form textarea {
+        width: 100%;
+        padding: 10px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        background: transparent;
+        color: inherit;
+      }
+
+      footer {
+        margin-top: 28px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      /* Responsive */
+      @media (max-width: 920px) {
+        .hero {
+          grid-template-columns: 1fr;
+        }
+        .contact-grid {
+          grid-template-columns: 1fr;
+        }
+        .slides {
+          padding-bottom: 12px;
+        }
+      }
+    </style>
+  </head>
+  <body data-theme="dark">
+    <div class="container">
+      <header>
+        <div class="brand">
+          <div class="logo">
+            <img
+              src="logo.jpeg"
+              alt=""
+              style="width: 150%; height: auto; display: block"
+            />
+          </div>
+          <div>
+            <div style="font-weight: 700">Dito Putra — Web Developer</div>
+            <div style="font-size: 12px; color: var(--muted)">
+              Dark mode elegant portfolio
+            </div>
+          </div>
+        </div>
+
+        <audio id="bgMusic" autoplay loop>
+          <source src="lagu.mp3" type="audio/mpeg" />
+          Browser Anda tidak mendukung audio.
+        </audio>
+
+        <nav>
+          <a href="#home">Home</a>
+          <a href="#about">About</a>
+          <a href="#education">Pendidikan</a>
+          <a href="#experience">Pengalaman</a>
+          <a href="#skills">Skills</a>
+          <a href="#projects">Projects</a>
+          <a href="#contact">Contact</a>
+        </nav>
+
+        <div class="controls">
+          <button class="btn" id="downloadCvBtn" title="Download CV">
+            Download CV
+          </button>
+          <button class="btn" id="themeToggle" title="Toggle theme">
+            🌙/☀️
+          </button>
+          <button class="btn" id="musicToggle" title="Music On/Off">🔊</button>
+        </div>
+      </header>
+
+      <main>
+        <section id="home" class="hero" data-aos="fade-up">
+          <div class="card intro">
+            <h1>Saya Dito Putra, Web Developer</h1>
+            <p>
+              Halo! Saya adalah seorang desainer web dengan latar belakang
+              Desain Komunikasi Visual (DKV) yang memiliki passion dalam
+              menciptakan Desain web yang menarik, fungsional, dan estetis.
+            </p>
+            <p>
+              Sebagai pemula di bidang Web Design dengan latar belakang Desain
+              Komunikasi Visual, saya terus menerus berkembang dan belajar untuk
+              menciptakan tampilan digital yang menarik, bermakna, dan
+              fungsional.
+            </p>
+
+            <div style="display: flex; gap: 10px; margin-top: 16px">
+              <a class="btn" href="#projects">Lihat Project</a>
+              <a class="btn" id="whatsappQuick" href="#"
+                >Hubungi via WhatsApp</a
+              >
+            </div>
+
+            <div style="margin-top: 18px; color: var(--muted)">
+              Tech stack: HTML • CSS • JavaScript • Git • REST • Responsive
+              Design
+            </div>
+          </div>
+
+          <aside class="card profile" data-aos="fade-left">
+            <div class="avatar">
+              <div class="avatar" style="padding: 0; overflow: hidden">
+                <img
+                  src="foto.jpeg"
+                  alt="Screenshot dari Landing Page Project A"
+                  style="width: 100%; height: auto; display: block"
+                />
+              </div>
+            </div>
+            <div style="font-weight: 700">Dito Putra</div>
+            <div class="meta">Web Developer — Frontend &amp; UI</div>
+            <div style="display: flex; gap: 8px; margin-top: 12px">
+              <a class="btn" href="#contact">Hire me</a>
+              <a class="btn" id="downloadCvSmall">CV</a>
+            </div>
+          </aside>
+        </section>
+
+        <section id="about" data-aos="fade-up">
+          <h2 class="section-title">About Me</h2>
+          <div class="card">
+            <p style="color: var(--muted); line-height: 1.6">
+              Saya seorang mahasiswa Teknik Informatika dengan ketertarikan
+              besar di dunia Web Design & UI/UX. Saat ini, saya sedang belajar
+              dan terus berkembang dalam menciptakan desain website yang
+              menarik, interaktif, dan user-friendly.
+            </p>
+          </div>
+        </section>
+
+        <section id="education" data-aos="fade-up">
+          <h2 class="section-title">Pendidikan</h2>
+          <div class="card">
+            <table
+              style="width: 100%; border-collapse: collapse; text-align: left"
+            >
+              <thead>
+                <tr style="background: rgba(255, 255, 255, 0.05)">
+                  <th style="padding: 12px">Tahun</th>
+                  <th style="padding: 12px">Institusi</th>
+                  <th style="padding: 12px">Jurusan</th>
+                  <th style="padding: 12px">Keterangan</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="padding: 12px">2023 – Sekarang</td>
+                  <td style="padding: 12px">Universitas Pamulang</td>
+                  <td style="padding: 12px">Teknik Informatika</td>
+                  <td style="padding: 12px">Mahasiswa Aktif</td>
+                </tr>
+                <tr style="background: rgba(255, 255, 255, 0.02)">
+                  <td style="padding: 12px">2020 – 2023</td>
+                  <td style="padding: 12px">SMK Letris Indonesia 2</td>
+                  <td style="padding: 12px">Multimedia</td>
+                  <td style="padding: 12px">Lulus</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="experience" data-aos="fade-up">
+          <h2 class="section-title">Pengalaman</h2>
+          <div class="card">
+            <table
+              style="width: 100%; border-collapse: collapse; text-align: left"
+            >
+              <thead>
+                <tr style="background: rgba(255, 255, 255, 0.05)">
+                  <th style="padding: 12px">Tahun</th>
+                  <th style="padding: 12px">Posisi</th>
+                  <th style="padding: 12px">Instansi / Project</th>
+                  <th style="padding: 12px">Deskripsi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="padding: 12px">2025</td>
+                  <td style="padding: 12px">Digital Marketing</td>
+                  <td style="padding: 12px">Magang</td>
+                  <td style="padding: 12px">
+                    Digital marketing adalah strategi atau upaya untuk
+                    memasarkan atau mempromosikan produk melalui segala jenis
+                    media digital, baik melalui internet atau jaringan lainnya
+                    yang saling terhubung.
+                  </td>
+                </tr>
+                <tr style="background: rgba(255, 255, 255, 0.02)">
+                  <td style="padding: 12px">2024</td>
+                  <td style="padding: 12px">Web Designer</td>
+                  <td style="padding: 12px">Project Pribadi</td>
+                  <td style="padding: 12px">
+                    Membuat website undangan pernikahan berbasis HTML, CSS, dan
+                    JavaScript.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="skills" data-aos="fade-up">
+          <h2 class="section-title">Skills</h2>
+          <div class="skills">
+            <div class="skill card">
+              <div style="font-weight: 700">HTML &amp; Semantics</div>
+              <div class="bar"><div class="fill" style="width: 80%"></div></div>
+            </div>
+            <div class="skill card">
+              <div style="font-weight: 700">
+                CSS (Responsive &amp; Animations)
+              </div>
+              <div class="bar"><div class="fill" style="width: 75%"></div></div>
+            </div>
+            <div class="skill card">
+              <div style="font-weight: 700">JavaScript</div>
+              <div class="bar"><div class="fill" style="width: 55%"></div></div>
+            </div>
+            <div class="skill card">
+              <div style="font-weight: 700">
+                Performance &amp; Accessibility
+              </div>
+              <div class="bar"><div class="fill" style="width: 80%"></div></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="projects" data-aos="fade-up">
+          <h2 class="section-title">Project Portfolio</h2>
+          <div class="card">
+            <div class="slider" id="projectSlider">
+              <div class="slides" id="slidesTrack">
+                <div class="slide" data-gsap>
+                  <div class="proj-img">
+                    <img
+                      src="gambar1.jpeg"
+                      alt="Screenshot dari Landing Page Project A"
+                      style="
+                        width: 100%;
+                        height: auto;
+                        margin-top: 130px;
+                        display: block;
+                      "
+                    />
+                  </div>
+                  <h3 style="margin-top: 150px">
+                    Project A — WEB Undangan Pernikan
+                  </h3>
+                  <p style="color: var(--muted)">
+                    Ini merupakan langkah awal yang menunjukkan kemampuan saya
+                    dalam front-end development, dan berfungsi sebagai awal dari
+                    perjalanan saya dalam mencari tahu lebih banyak tentang
+                    desain web. Saya terus menerus belajar dan berinovasi untuk
+                    meningkatkan kualitas interaksi pengguna.
+                  </p>
+                </div>
+
+                <div class="slide" data-gsap>
+                  <div class="proj-img">
+                    <img
+                      src="gambar2.jpeg"
+                      alt="Screenshot dari Landing Page Project A"
+                      style="
+                        width: 100%;
+                        height: auto;
+                        margin-top: 50px;
+                        display: block;
+                      "
+                    />
+                  </div>
+                  <h3 style="margin-top: 55px">Project B — WEB Bola</h3>
+                  <p style="color: var(--muted)">
+                    Project ini adalah latihan saya dalam membangun website
+                    statis dengan desain yang modern dan responsif.
+                  </p>
+                </div>
+
+                <div class="slide" data-gsap>
+                  <div class="proj-img">
+                    <img
+                      src="gambar3.jpeg"
+                      alt="Screenshot dari Landing Page Project A"
+                      style="
+                        width: 100%;
+                        height: auto;
+                        margin-top: 150px;
+                        display: block;
+                      "
+                    />
+                  </div>
+                  <h3 style="margin-top: 180px">Project C — Desain</h3>
+                  <p style="color: var(--muted)">
+                    Saya percaya bahwa setiap desain adalah proses, dan saya
+                    terus berkembang dengan setiap karya yang saya buat.
+                    Portofolio ini adalah jejak perjalanan saya dalam dunia
+                    desain, dan saya siap untuk terus belajar serta menghadapi
+                    tantangan baru
+                  </p>
+                </div>
+
+                <div class="slide" data-gsap>
+                  <div class="proj-img">
+                    <video
+                      autoplay
+                      muted
+                      loop
+                      playsinline
+                      style="width: 100%; border-radius: 18px"
+                    >
+                      <source src="video.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                  <h3 style="margin-top: 55px">Project D - Video Projek</h3>
+                  <p style="color: var(--muted)">
+                    Project ini adalah video yang pernah saya buat.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="slider-controls">
+              <button class="btn" id="prev">◀</button>
+              <button class="btn" id="next">▶</button>
+              <div
+                style="margin-left: auto; color: var(--muted); font-size: 13px"
+              >
+                Use arrows or swipe (mobile)
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="contact" data-aos="fade-up">
+          <h2 class="section-title">Contact</h2>
+          <div class="card contact-grid">
+            <form id="contactForm">
+              <label style="font-weight: 700">Nama</label>
+              <input type="text" id="name" placeholder="Nama Anda" required />
+              <label style="font-weight: 700; margin-top: 8px">Email</label>
+              <input
+                type="email"
+                id="email"
+                placeholder="email@domain.com"
+                required
+              />
+              <label style="font-weight: 700; margin-top: 8px">Pesan</label>
+              <textarea
+                id="message"
+                rows="5"
+                placeholder="Halo, saya tertarik..."
+                required
+              ></textarea>
+              <div style="display: flex; gap: 8px; margin-top: 10px">
+                <button type="submit" class="btn">Kirim (Email)</button>
+                <button type="button" class="btn" id="sendWhatsapp">
+                  Kirim via WhatsApp
+                </button>
+              </div>
+            </form>
+
+            <div
+              style="
+                padding: 12px;
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+              "
+            >
+              <div class="card">
+                <div style="font-weight: 700">Quick contact</div>
+                <div style="color: var(--muted); margin-top: 6px">
+                  Email: hello@contoh.com
+                </div>
+                <div style="color: var(--muted)">Phone: +62 859-4505-2199</div>
+              </div>
+
+              <div class="card">
+                <div style="font-weight: 700">Location</div>
+                <div style="color: var(--muted); margin-top: 6px">
+                  Jakarta, Indonesia
+                </div>
+              </div>
+
+              <div class="card">
+                <div style="font-weight: 700">Download CV</div>
+                <div style="color: var(--muted); margin-top: 6px">
+                  Klik tombol Download CV di header atau di sini.
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        © <span id="year"></span> DXO — Web Developer. Built with ♥ in Dark
+        Mode.
+      </footer>
+    </div>
+
+    <!-- Libraries init -->
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script>
+      // AOS
+      AOS.init({ duration: 800, once: true });
+
+      // Theme toggle
+      const themeToggle = document.getElementById("themeToggle");
+      const body = document.body;
+      const saved = localStorage.getItem("theme");
+      if (saved) body.setAttribute("data-theme", saved);
+      themeToggle.addEventListener("click", () => {
+        const cur = body.getAttribute("data-theme") || "dark";
+        const next = cur === "dark" ? "light" : "dark";
+        body.setAttribute("data-theme", next);
+        localStorage.setItem("theme", next);
+      });
+
+      // Year
+      document.getElementById("year").textContent = new Date().getFullYear();
+
+      // Simple slider
+      const track = document.getElementById("slidesTrack");
+      const slides = Array.from(track.children);
+      let index = 0;
+      const prev = document.getElementById("prev");
+      const nextBtn = document.getElementById("next");
+
+      function update() {
+        const slideW = slides[0].getBoundingClientRect().width + 12; // gap
+        track.style.transform = `translateX(${-index * slideW}px)`;
+      }
+      prev.addEventListener("click", () => {
+        index = Math.max(0, index - 1);
+        update();
+      });
+      nextBtn.addEventListener("click", () => {
+        index = Math.min(slides.length - 1, index + 1);
+        update();
+      });
+
+      // drag / swipe support
+      let startX = 0,
+        currentX = 0,
+        isDown = false;
+      track.addEventListener("pointerdown", (e) => {
+        isDown = true;
+        startX = e.clientX;
+        track.style.cursor = "grabbing";
+      });
+      track.addEventListener("pointermove", (e) => {
+        if (!isDown) return;
+        currentX = e.clientX;
+      });
+      track.addEventListener("pointerup", () => {
+        if (!isDown) return;
+        isDown = false;
+        track.style.cursor = "grab";
+        const dx = startX - currentX;
+        if (Math.abs(dx) > 40) {
+          if (dx > 0) index = Math.min(slides.length - 1, index + 1);
+          else index = Math.max(0, index - 1);
+          update();
+        }
+      });
+      track.addEventListener("pointerleave", () => {
+        if (isDown) track.dispatchEvent(new Event("pointerup"));
+      });
+
+      // GSAP subtle entrance for project cards
+      window.addEventListener("load", () => {
+        gsap.from("[data-gsap]", {
+          y: 18,
+          opacity: 0,
+          stagger: 0.12,
+          duration: 0.8,
+          ease: "power3.out",
+        });
+      });
+
+      // Contact form -> mailto (simple) and WhatsApp
+      const contactForm = document.getElementById("contactForm");
+      contactForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const n = document.getElementById("name").value;
+        const em = document.getElementById("email").value;
+        const msg = document.getElementById("message").value;
+        const subject = encodeURIComponent("Inquiry from portfolio - " + n);
+        const body = encodeURIComponent(`Name: ${n}\nEmail: ${em}\n\n${msg}`);
+        window.location.href = `mailto:hello@contoh.com?subject=${subject}&body=${body}`;
+      });
+
+      document.getElementById("sendWhatsapp").addEventListener("click", () => {
+        const n = document.getElementById("name").value || "-";
+        const msg = document.getElementById("message").value || "-";
+        const text = encodeURIComponent(`Halo, saya ${n}. ${msg}`);
+        // change number to your WA number in international format without plus
+        window.open(`https://wa.me/6285945052199?text=${text}`, "_blank");
+      });
+
+      document
+        .getElementById("whatsappQuick")
+        .addEventListener("click", (e) => {
+          e.preventDefault();
+          const text = encodeURIComponent(
+            "Halo Dito Puta, saya tertarik dengan layanan development Anda."
+          );
+          window.open(`https://wa.me/6285945052199?text=${text}`, "_blank");
+        });
+
+      // Download CV using jsPDF
+      const { jsPDF } = window.jspdf;
+      function generateCvPdf() {
+        const doc = new jsPDF();
+        doc.setFontSize(18);
+        doc.text("Dito Putra — Web Developer", 14, 20);
+        doc.setFontSize(12);
+        doc.text("Email: hello@contoh.com", 14, 30);
+        doc.text("Phone: +62 812-3456-7890", 14, 36);
+        doc.text("Location: Jakarta, Indonesia", 14, 42);
+        doc.text(
+          "\nAbout:\nWeb developer berpengalaman membangun UI responsive dan maintainable code. Spesialis pada HTML, CSS, dan JavaScript.",
+          14,
+          54
+        );
+        doc.text(
+          "\nSkills:\n- HTML (95%)\n- CSS (92%)\n- JavaScript (88%)\n- Performance & Accessibility (80%)",
+          14,
+          86
+        );
+        doc.save("Zaki_CV.pdf");
+      }
+
+      document
+        .getElementById("downloadCvBtn")
+        .addEventListener("click", generateCvPdf);
+      document
+        .getElementById("downloadCvSmall")
+        .addEventListener("click", generateCvPdf);
+
+      // Quick small helper to set initial sizes after fonts load
+      window.addEventListener("resize", update);
+      setTimeout(update, 300);
+    </script>
+    <script>
+      const bgMusic = document.getElementById("bgMusic");
+      const musicToggle = document.getElementById("musicToggle");
+      let isPlaying = true;
+
+      musicToggle.addEventListener("click", () => {
+        if (isPlaying) {
+          bgMusic.pause();
+          musicToggle.textContent = "🔇";
+        } else {
+          bgMusic.play();
+          musicToggle.textContent = "🔊";
+        }
+        isPlaying = !isPlaying;
+      });
+
+      // Volume default (lebih nyaman)
+      bgMusic.volume = 0.3;
+    </script>
+  </body>
+</html>
